@@ -1,7 +1,7 @@
 import express from 'express'
 import userRouter from './Features/user/user.routes.js'
 import productRouter from './Features/product/product.routes.js'
-import logRouter from './Features/logs/log.routes.js'
+import logRouter from './Features/systemLogs/log.routes.js'
 
 const mainRouter = express.Router()
 
