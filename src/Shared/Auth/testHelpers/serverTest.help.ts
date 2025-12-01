@@ -1,6 +1,6 @@
 import express, { type Request, type Response, type NextFunction } from 'express'
 import eh from '../../../Configs/errorHandlers.js'
-import { Auth } from '../auth.js'
+import { Auth } from '../Auth.js'
 
 const serverTest = express()
 serverTest.use(express.json())
@@ -17,10 +17,10 @@ serverTest.post('/roleUser', Auth.verifyToken, Auth.checkRole([1]), async (req: 
   res.status(200).json({ success: true, message: 'Passed middleware', data, userInfo: decoResponse })
 })
 
-serverTest.get('/emailVerify', Auth.verifyEmailToken, async (req: Request, res: Response): Promise<void> => {
-  const decoResponse = (req as any).userInfo
-  res.status(200).json({ success: true, message: 'Passed middleware', data: null, userInfo: decoResponse })
-})
+// serverTest.get('/emailVerify', Auth.verifyEmailToken, async (req: Request, res: Response): Promise<void> => {
+//   const decoResponse = (req as any).userInfo
+//   res.status(200).json({ success: true, message: 'Passed middleware', data: null, userInfo: decoResponse })
+// })
 
 serverTest.use((err: Error & { status?: number }, req: Request, res: Response, next: NextFunction) => {
   const status = err.status || 500

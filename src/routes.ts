@@ -1,5 +1,5 @@
 import express from 'express'
-import userRouter from './Features/user/user.route.js'
+import userRouter from './Features/user/user.routes.js'
 import productRouter from './Features/product/product.routes.js'
 import logRouter from './Features/logs/log.routes.js'
 

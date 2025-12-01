@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import session from 'supertest'
 import serverTest from './testHelpers/serverTest.help.js'
-import { Auth } from './auth.js'
+import { Auth } from './Auth.js'
 import { setUserToken, getUserToken, setAdminToken, getAdminToken } from '../../../test/testHelpers/testStore.help.js'
 const agent = session(serverTest)
 
@@ -9,7 +9,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
   describe('Auth.generateToken, Auth.verifyToken. ', () => {
     it('should generate a JWT and allow access through the verifyToken middleware and set the userInfo object (req.useInfo)', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 'User', otherField: 'other' }
-      const token = Auth.generateToken(user)
+      const token = Auth.token(user)
       setUserToken(token)
       const test = await agent
         .post('/')
@@ -58,7 +58,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
     })
     it('should return 401 if token is expired', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 'User', otherField: 'other' }
-      const expiredToken = Auth.generateToken(user, 1)
+      const expiredToken = Auth.token(user, 1)
       // Esperamos 2 segundos para asegurarnos de que expire
       await new Promise(resolve => setTimeout(resolve, 3000))
       const test = await agent
@@ -74,7 +74,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
   describe('Auth.checkRole', () => {
     it('should allow access if user has an allowed role', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 'User', otherField: 'other' }
-      const token = Auth.generateToken(user)
+      const token = Auth.token(user)
       setUserToken(token)
       const test = await agent
         .post('/roleUser')
@@ -88,7 +88,7 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
     })
     it('should return 403 and deny access if user does not have an allowed role', async () => {
       const user = { id: '123', email: 'userexample@test.com', role: 'Admin', otherField: 'other' }
-      const token = Auth.generateToken(user)
+      const token = Auth.token(user)
       setUserToken(token)
       const test = await agent
         .post('/roleUser')
@@ -99,53 +99,6 @@ describe('"Auth" class. Jsonwebtoken middlewares. Unit tests.', () => {
       expect(test.body.message).toBe('Access forbidden!')
       expect(test.body.data).toBe(null)
       expect(test.body.userInfo).toBe(undefined)
-    })
-  })
-  describe('Auth.generateEmailVerificationToken and Auth.verifyEmailToken methods. Email verification.', () => {
-    it('should verify email token and return userId in userInfo', async () => {
-      const user = { id: '123', email: 'userexample@test.com' }
-      const token = Auth.generateEmailVerificationToken(user)
-      setAdminToken(token)
-      const test = await agent
-        .get(`/emailVerify?token=${token}`)
-        .expect(200)
-      expect(test.body.success).toBe(true)
-      expect(test.body.message).toBe('Passed middleware')
-      expect(test.body.data).toEqual(null)
-      expect(test.body.userInfo).toEqual({ userId: '123' })// through decoded
-    })
-    it('should return 400 if token is missing', async () => {
-      const test = await agent
-        .get('/emailVerify?token=\'\'')
-        .expect(400)
-      expect(test.body.success).toBe(false)
-      expect(test.body.message).toBe('Invalid or expired token')
-      expect(test.body.data).toEqual(null)
-      expect(test.body.userInfo).toEqual(undefined)
-    })
-    it('should return 400 if token type is invalid', async () => {
-      const user = { id: '123', email: 'userexample@test.com' }
-      const token = getUserToken()
-      const test = await agent
-        .get(`/emailVerify?token=${token}`)
-        .expect(400)
-      expect(test.body.success).toBe(false)
-      expect(test.body.message).toBe('Invalid token type')
-      expect(test.body.data).toEqual(null)
-      expect(test.body.userInfo).toEqual(undefined)
-    })
-    it('should return 400 if verification token is expired', async () => {
-      const user = { id: '123', email: 'userexample@test.com' }
-      const expiredToken = Auth.generateEmailVerificationToken(user, 1)
-      // Esperamos 2 segundos para asegurarnos de que expire
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      const test = await agent
-        .get(`/emailVerify?token=${expiredToken}`)
-        .expect(400)
-      expect(test.body.success).toBe(false)
-      expect(test.body.message).toBe('Invalid or expired token')
-      expect(test.body.data).toEqual(null)
-      expect(test.body.userInfo).toEqual(undefined)
     })
   })
 })

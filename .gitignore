@@ -77,7 +77,6 @@ firebase-admin-key.json
 .env
 .env.*
 !.env.example
-
 # ---------------------------------------
 # VSCode (opcional)
 # ---------------------------------------

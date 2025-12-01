@@ -22,7 +22,7 @@
     "index.ts",
     "src/**/*.ts",
     //"src/@types/**/*.d.ts", 
-    "src/Shared/Swagger/schemas/tools/generateSchema.ts",
+    "src/Shared/Swagger/schemas/tools/generateSchema.ts", "src/Features/user/user.routes.ts",
       
   ],
   "exclude": [
